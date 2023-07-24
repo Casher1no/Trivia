@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
+use App\Api\NumberApiFacts;
 use App\Models\FactsInterface;
-use App\Services\NumberApiFacts;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider

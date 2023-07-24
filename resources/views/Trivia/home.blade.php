@@ -15,6 +15,9 @@
 <body>
 <div class="center-container">
     <div class="centered-content">
+        @if(!empty($error))
+            <a class="error">{{$error}}</a>
+        @endif
         <h2>Start New Game</h2>
         <a href="{{ url('/game') }}" class="button">Start</a>
     </div>

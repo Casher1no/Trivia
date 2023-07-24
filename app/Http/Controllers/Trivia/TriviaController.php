@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Trivia;
 
 use App\Http\Controllers\Trivia\Services\CreateTriviaQuestionsService;
 use App\Models\FactsInterface;
+use Exception;
+
 
 class TriviaController
 {
@@ -23,9 +25,14 @@ class TriviaController
 
     public function startGame()
     {
-        return $this->createTriviaQuestionsService->__invoke($this->facts->getRandomTrivia(1, 100, 20)->json());
+        try {
+             $questions = $this->createTriviaQuestionsService->__invoke(
+                $this->facts->getRandomTrivia(1, 100, 20)->json()
+            );
+        } catch (Exception $e) {
+            return view('Trivia/home', ['error' => 'Something went wrong!']);
+        }
 
-
-        return view('Trivia/game');
+        return view('Trivia/game', ['questions' => $questions]);
     }
 }

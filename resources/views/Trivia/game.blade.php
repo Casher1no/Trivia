@@ -12,7 +12,16 @@
     <link rel="stylesheet" href="{{ asset('css/main.css') }}" />
 
 </head>
+<?php
+
+$a = 5;
+
+?>
+
 <body>
-Game
+
+<h1>{{$a}}</h1>
+
+
 </body>
 </html>
