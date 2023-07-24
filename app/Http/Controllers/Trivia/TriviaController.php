@@ -43,50 +43,41 @@ class TriviaController
 
     public function submit(Request $request)
     {
-        // Check if answer is correct
+        $questionCorrectAnswer = $request->input('questionCorrectAnswer');
+        $userAnswered = $request->input('userAnswered');
+
+        // Check if the answer is correct
         $isCorrect = $this->checkTriviaAnswerService->__invoke(
-            new CheckTriviaAnswerRequest(
-                $request->input('questionCorrectAnswer'),
-                $request->input('userAnswered')
-            )
+            new CheckTriviaAnswerRequest($questionCorrectAnswer, $userAnswered)
         );
 
-        $alreadyAnswered = $request->input('alreadyAnswered');
-        $alreadyAnswered = $alreadyAnswered == 'null' ? [] : $alreadyAnswered;
+        $alreadyAnswered = $request->input('alreadyAnswered', 'null') !== 'null'
+            ? explode(',', $request->input('alreadyAnswered'))
+            : [];
 
-
-        $answeredCount = 0;
-        if (!empty($alreadyAnswered)) {
-            $alreadyAnswered = explode(',', $alreadyAnswered);
-            $answeredCount = count($alreadyAnswered);
-        }
-
-        if (!$isCorrect) {
-
-            $questionAnswers = $request->input('questionAnswers');
-            $questionAnswers = explode(',', str_replace(['[', ']'], '', $questionAnswers));
-
-
-            return view('Trivia/lose',
-                [
-                    'correctAnswered' => $answeredCount,
-                    'totalQuestions' => self::QUESTION_COUNT,
-
-                    'question' => $request->input('question'),
-                    'userAnswered' => $request->input('userAnswered'),
-                    'correctAnswer' => $request->input('correctAnswer'),
-                    'questionAnswers' => $questionAnswers,
-                    'questionCorrectAnswer' => $request->input('questionCorrectAnswer'),
-                ]);
-        }
-
-        $alreadyAnswered[] = $request->input('userAnswered');
         $answeredCount = count($alreadyAnswered);
 
-        if ($answeredCount == self::QUESTION_COUNT) {
-            return view('Trivia/won', [
+        if (!$isCorrect) {
+            $questionAnswers = explode(',', str_replace(['[', ']'], '', $request->input('questionAnswers')));
+
+            return view('Trivia.lose', [
                 'correctAnswered' => $answeredCount,
-                'totalQuestions' => self::QUESTION_COUNT
+                'totalQuestions' => self::QUESTION_COUNT,
+                'question' => $request->input('question'),
+                'userAnswered' => $userAnswered,
+                'questionAnswers' => $questionAnswers,
+                'questionCorrectAnswer' => $questionCorrectAnswer,
+            ]);
+        }
+
+        $alreadyAnswered[] = $userAnswered;
+
+        $answeredCount = count($alreadyAnswered);
+
+        if ($answeredCount === self::QUESTION_COUNT) {
+            return view('Trivia.won', [
+                'correctAnswered' => $answeredCount,
+                'totalQuestions' => self::QUESTION_COUNT,
             ]);
         }
 
@@ -94,10 +85,9 @@ class TriviaController
             new CreateTriviaQuestionRequest($alreadyAnswered)
         );
 
-        return view('Trivia/game', [
+        return view('Trivia.game', [
             'correctAnswered' => $answeredCount,
             'totalQuestions' => self::QUESTION_COUNT,
-
             'question' => $question,
             'alreadyAnswered' => $alreadyAnswered,
         ]);

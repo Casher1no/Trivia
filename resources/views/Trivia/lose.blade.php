@@ -15,8 +15,8 @@
 <body>
 <div class="center-container">
     <div class="centered-content">
+        <h3 class="question">{{$question}}</h3>
         <h5>{{ $correctAnswered }} / {{ $totalQuestions }}</h5>
-        <h3>{{$question}}</h3>
         <div class="answers">
 
             @foreach($questionAnswers as $answer)
