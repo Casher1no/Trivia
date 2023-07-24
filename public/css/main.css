@@ -14,6 +14,7 @@ body {
 
 .centered-content {
     text-align: center;
+    margin: auto;
 }
 
 h2 {
@@ -41,6 +42,34 @@ h2 {
     background-color: #f69999;
     border-radius: 5px;
     padding: 10px;
+}
+.question{
+    text-align: center;
+}
+
+.answers{
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px; /* Adjust the width as needed */
+    padding: 10px;
+}
+.answer{
+    margin: 5px;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    font-size: 16px;
+    cursor: pointer;
+}
+.correct{
+    background-color: palegreen;
+}
+.wrong{
+    background-color: palevioletred;
 }
 
 /* Add responsive styles */

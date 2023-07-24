@@ -9,19 +9,27 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}"/>
 
 </head>
-<?php
-
-$a = 5;
-
-?>
-
 <body>
+<div class="center-container">
+    <form method="post" action="/game">
+        <h2 class="question">Question</h2>
+        <h3 class="question"style="max-width: 600px">{{$question->question()}}</h3>
 
-<h1>{{$a}}</h1>
-
+        @csrf
+        <input type="hidden" name="questionCorrectAnswer" value="{{ $question->correctAnswer() }}">
+        <input type="hidden" name="questionAnswers" value="{{ json_encode($question->answers()) }}">
+        <input type="hidden" name="alreadyAnswered" value="{{ $answered ?? '' }}">
+        <input type="hidden" name="question" value="{{ $question->question() }}">
+        <div class="answers">
+    @foreach($question->answers() as $answer)
+            <input class="answer" type="submit" name="userAnswered" value="{{$answer}}">
+        @endforeach
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

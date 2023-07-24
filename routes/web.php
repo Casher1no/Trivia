@@ -16,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [TriviaController::class, 'index']);
 Route::get('/game', [TriviaController::class, 'startGame']);
+Route::post('/game',[TriviaController::class, 'submit']);
