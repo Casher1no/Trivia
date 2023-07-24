@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Trivia\Services;
 
 use App\Models\FactsInterface;
 use App\Models\Trivia\Question;
-use Illuminate\Http\Request;
 
 class CreateTriviaQuestionsService
 {
@@ -17,12 +16,15 @@ class CreateTriviaQuestionsService
 
     public function __invoke(?CreateTriviaQuestionRequest $request = null): Question
     {
+        $numberFactsAnswered = [];
         if (!empty($request)) {
-            dd($request->numbers());
+            $numberFactsAnswered = $request->numbers();
         }
 
-        // Random number fact from 1-100
-        $number = rand(1,100);
+        do {
+            $number = rand(1, 100);
+        } while (in_array((string)$number, $numberFactsAnswered));
+
         $fact = $this->facts->getFact($number);
 
         // Converts fact to question

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Trivia;
 
 use App\Http\Controllers\Trivia\Services\CheckTriviaAnswerRequest;
 use App\Http\Controllers\Trivia\Services\CheckTriviaAnswerService;
+use App\Http\Controllers\Trivia\Services\CreateTriviaQuestionRequest;
 use App\Http\Controllers\Trivia\Services\CreateTriviaQuestionsService;
 use Exception;
 use Illuminate\Http\Request;
@@ -35,12 +36,14 @@ class TriviaController
 
         return view('Trivia/game', [
             'question' => $questions,
+            'totalQuestions' => self::QUESTION_COUNT,
+            'correctAnswered' => 0
         ]);
     }
 
     public function submit(Request $request)
     {
-        // Check if correct
+        // Check if answer is correct
         $isCorrect = $this->checkTriviaAnswerService->__invoke(
             new CheckTriviaAnswerRequest(
                 $request->input('questionCorrectAnswer'),
@@ -48,9 +51,17 @@ class TriviaController
             )
         );
 
+        $alreadyAnswered = $request->input('alreadyAnswered');
+        $alreadyAnswered = $alreadyAnswered == 'null' ? [] : $alreadyAnswered;
+
+
+        $answeredCount = 0;
+        if (!empty($alreadyAnswered)) {
+            $alreadyAnswered = explode(',', $alreadyAnswered);
+            $answeredCount = count($alreadyAnswered);
+        }
+
         if (!$isCorrect) {
-            $correctAnswered = json_decode($request->input('alreadyAnswered'), true) ?? [];
-            $correctAnswered = count($correctAnswered);
 
             $questionAnswers = $request->input('questionAnswers');
             $questionAnswers = explode(',', str_replace(['[', ']'], '', $questionAnswers));
@@ -58,7 +69,7 @@ class TriviaController
 
             return view('Trivia/lose',
                 [
-                    'correctAnswered' => $correctAnswered,
+                    'correctAnswered' => $answeredCount,
                     'totalQuestions' => self::QUESTION_COUNT,
 
                     'question' => $request->input('question'),
@@ -69,7 +80,26 @@ class TriviaController
                 ]);
         }
 
-        $question = $this->createTriviaQuestionsService->__invoke(json_decode($request->input('questions')));
-        $result = json_decode($request->input('questions'));
+        $alreadyAnswered[] = $request->input('userAnswered');
+        $answeredCount = count($alreadyAnswered);
+
+        if ($answeredCount == self::QUESTION_COUNT) {
+            return view('Trivia/won', [
+                'correctAnswered' => $answeredCount,
+                'totalQuestions' => self::QUESTION_COUNT
+            ]);
+        }
+
+        $question = $this->createTriviaQuestionsService->__invoke(
+            new CreateTriviaQuestionRequest($alreadyAnswered)
+        );
+
+        return view('Trivia/game', [
+            'correctAnswered' => $answeredCount,
+            'totalQuestions' => self::QUESTION_COUNT,
+
+            'question' => $question,
+            'alreadyAnswered' => $alreadyAnswered,
+        ]);
     }
 }

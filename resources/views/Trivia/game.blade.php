@@ -16,17 +16,18 @@
 <div class="center-container">
     <form method="post" action="/game">
         <h2 class="question">Question</h2>
-        <h3 class="question"style="max-width: 600px">{{$question->question()}}</h3>
+        <h4 class="question">{{ $correctAnswered }} / {{ $totalQuestions }}</h4>
+        <h3 class="question" style="max-width: 600px">{{$question->question()}}</h3>
 
         @csrf
         <input type="hidden" name="questionCorrectAnswer" value="{{ $question->correctAnswer() }}">
         <input type="hidden" name="questionAnswers" value="{{ json_encode($question->answers()) }}">
-        <input type="hidden" name="alreadyAnswered" value="{{ $answered ?? '' }}">
+        <input type="hidden" name="alreadyAnswered" value="{{ json_encode($answered ?? null) }}">
         <input type="hidden" name="question" value="{{ $question->question() }}">
         <div class="answers">
-    @foreach($question->answers() as $answer)
-            <input class="answer" type="submit" name="userAnswered" value="{{$answer}}">
-        @endforeach
+            @foreach($question->answers() as $answer)
+                <input class="answer" type="submit" name="userAnswered" value="{{$answer}}">
+            @endforeach
         </div>
     </form>
 </div>
